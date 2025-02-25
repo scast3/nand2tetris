@@ -28,6 +28,39 @@ void load_map(const std::string& filename, std::unordered_map<std::string, std::
     infile.close();
 }
 
+
+
+void next_command(std::ifstream& infile) {
+    std::string line;
+    while (std::getline(infile, line)) {
+        // Process the line (for now, just print it)
+        std::cout << line << std::endl;
+    }
+}
+
+// void first_pass(char* inputs, int pc){
+
+// }
+
+// void second_pass(){
+    
+// }
+
+// void translate(){
+
+// }
+
+// void translate_A(){
+
+// }
+
+// void translate_R(){
+
+// }
+
+
+// input will be in the format: ./Assembler <filename.asm>
+
 int main (int argc, char** argv){
 
     if (argc != 2) {
@@ -39,37 +72,14 @@ int main (int argc, char** argv){
 
     int pc = -1;
 
-    char* input_file = argv[1];
+    std::string input_file = argv[1];
+    std::ifstream infile(input_file);
 
-    //first_pass(input_file, pc);
-    next_command(input_file);
-
-}
-
-void first_pass(char* inputs, int pc){
-
-}
-
-void second_pass(){
-    
-}
-
-void next_command(std::ifstream& infile) {
-    std::string line;
-    while (std::getline(infile, line)) {
-        // Process the line (for now, just print it)
-        std::cout << line << std::endl;
+    if (!infile.is_open()) {
+        std::cerr << "Error opening file: " << input_file << std::endl;
+        return 1;
     }
-}
 
-void translate(){
-
-}
-
-void translate_A(){
-
-}
-
-void translate_R(){
+    next_command(infile);
 
 }

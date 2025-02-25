@@ -4,11 +4,15 @@
 #include <fstream>
 #include <sstream>
 
+// global maps (bad design?)
 std::unordered_map<std::string, std::string> comp;
 std::unordered_map<std::string, std::string> dest;
 std::unordered_map<std::string, std::string> jump;
 
-void load_map(const std::string& filename, std::unordered_map<std::string, std::string>& comp) {
+std::unordered_map<std::string, int> symbols;
+
+// load maps from the textfile
+void load_map(const std::string& filename, std::unordered_map<std::string, std::string>& my_map) {
     std::ifstream infile(filename);
     std::string line;
 
@@ -17,7 +21,7 @@ void load_map(const std::string& filename, std::unordered_map<std::string, std::
         std::string key, value;
 
         if (std::getline(iss, key, ',') && std::getline(iss, value)) {
-            comp[key] = value;
+            my_map[key] = value;
         }
     }
 
@@ -37,7 +41,8 @@ int main (int argc, char** argv){
 
     char* input_file = argv[1];
 
-    first_pass(input_file, pc);
+    //first_pass(input_file, pc);
+    next_command(input_file);
 
 }
 
@@ -49,8 +54,12 @@ void second_pass(){
     
 }
 
-void next_command(){
-
+void next_command(std::ifstream& infile) {
+    std::string line;
+    while (std::getline(infile, line)) {
+        // Process the line (for now, just print it)
+        std::cout << line << std::endl;
+    }
 }
 
 void translate(){
@@ -61,6 +70,6 @@ void translate_A(){
 
 }
 
-void translate_B(){
+void translate_R(){
 
 }

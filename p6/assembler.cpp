@@ -79,7 +79,8 @@ int main (int argc, char** argv){
         std::cerr << "Error opening file: " << input_file << std::endl;
         return 1;
     }
-
-    next_command(infile);
-
+    std::cout << "file has been read!" << std::endl;
+    infile.close();
+    // next_command(infile);
+    return 0;
 }

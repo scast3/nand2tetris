@@ -11,8 +11,12 @@ std::unordered_map<std::string, std::string> dest;
 std::unordered_map<std::string, std::string> jump;
 
 std::unordered_map<std::string, int> symbols;
+std::unordered_map<std::string, int> labels;
 
 int pc;
+
+//vector to store all commands
+std::vector<std::string> commands;
 
 // load maps from the textfile
 void load_map(const std::string& filename, std::unordered_map<std::string, std::string>& my_map) {
@@ -60,34 +64,45 @@ void first_pass(std::ifstream& infile, int& pc){
         if (command == "~") break; // break if file end
         
         if (!(command == "")){
-            if(command[0] == '('){ // found label
+            if(command[0] == '('){ // found label - there might be a better way than just looking at first char
                 std::string label = std::regex_replace(command, labelFormat, "$1");
-                symbols[label] = pc; // store the pc for each label
+                labels[label] = pc; // store the pc for each label
             }else{
-                std::cout << "PC: "  << pc << ", Command: " << command << std::endl;
+                commands.push_back(command);
                 pc++;
             }
         }
     }   
-
 }
 
-// void second_pass(){
-    
-// }
+std::string translate_A(std::string command){
+    return "A";
+}
 
-// void translate(){
+std::string translate_R(std::string command){
 
-// }
+    return "R";
+}
 
-// void translate_A(){
+std::string translate(std::string command){
+    std::regex whitespaces("\\s+");
+    command = std::regex_replace(command, whitespaces, "");
 
-// }
+    if (command[0]=='@'){
+        return translate_A(command);
+    }else{
+        return translate_R(command);
+    }
+}
 
-// void translate_R(){
-
-// }
-
+void second_pass(std::ofstream& outfile){
+    std::string binary_command;
+    // somewhere, variable mem location needs to be change
+    for (const std::string& command : commands){ //iterate through commands
+        binary_command = translate(command);
+        outfile << binary_command << std::endl; // write binary to output file
+    }
+}
 
 // input will be in the format: ./Assembler <filename.asm>
 
@@ -107,9 +122,19 @@ int main (int argc, char** argv){
         std::cerr << "Error opening file: " << input_file << std::endl;
         return 1;
     }
-    
+
+    std::string output_file = input_file;
+    size_t pos = output_file.find(".asm");
+    if (pos != std::string::npos) {
+        output_file.replace(pos, 4, ".hack");
+    } else {
+        output_file += ".hack";
+    }
+    std::ofstream outfile(output_file);
     
     first_pass(infile, pc);
+    second_pass(outfile);
+
     infile.close();
     return 0;
 }

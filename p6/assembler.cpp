@@ -31,8 +31,6 @@ void load_map(const std::string& filename, std::unordered_map<std::string, std::
     infile.close();
 }
 
-
-
 std::string next_command(std::ifstream& infile) {
     std::string line;
     std::regex comments("//.*");
@@ -42,7 +40,7 @@ std::string next_command(std::ifstream& infile) {
         line = std::regex_replace(line, comments, "");
         line = std::regex_replace(line, whitespaces, "");
         return line;
-    }return "~";
+    }return "~"; //EOF marker - might need to change????
 
     // use this to test
     // while (std::getline(infile, line)) {
@@ -56,15 +54,19 @@ std::string next_command(std::ifstream& infile) {
 void first_pass(std::ifstream& infile, int& pc){
     pc = 0;
     std::string command;
+    std::regex labelFormat("^\\((.*)\\)$");
     for (;;){
         command = next_command(infile);
-        // ignore line if empty or if label
-        bool ignoreLine = command == "" || command[0] != '(';
         if (command == "~") break; // break if file end
         
-        if (!ignoreLine){
-            std::cout << "PC: "  << pc << ", Command: " << command << std::endl;
-            pc++;
+        if (!(command == "")){
+            if(command[0] == '('){ // found label
+                std::string label = std::regex_replace(command, labelFormat, "$1");
+                symbols[label] = pc; // store the pc for each label
+            }else{
+                std::cout << "PC: "  << pc << ", Command: " << command << std::endl;
+                pc++;
+            }
         }
     }   
 

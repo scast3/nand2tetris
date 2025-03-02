@@ -96,22 +96,22 @@ std::string translate_A(std::string command, int& ramAddr){
     std::smatch match;
     std::regex_match(command, match, a_command);
     std::string value = match[1];
-
+    std::string a_header = "R: 0";
 
     try { // value is int
         int intValue = std::stoi(value);  // Try to convert it to an integer
         std::string binary_value = std::bitset<15>(intValue).to_string(); // convert to binary
-        return "1" + binary_value; // a instructions start with 1
+        return a_header + binary_value; // a instructions start with 0
     } catch (const std::invalid_argument& e) { // value is string
         if (symbols.find(value) != symbols.end()){ // if the string is in symbols
             int mem_val = symbols[value]; // extract mem value from symbol
             std::string binary_value = std::bitset<15>(mem_val).to_string();
-            return "1" + binary_value;
+            return a_header + binary_value;
         }else{ // if not in symbols, need to add it in memory
             symbols[value] = ramAddr;
             ramAddr++;
             std::string binary_value = std::bitset<15>(ramAddr).to_string();
-            return "1" + binary_value;
+            return a_header + binary_value;
         } 
     }
 
@@ -123,20 +123,26 @@ std::string translate_C(std::string command, int& ramAddr){
     std::smatch match;
 
     std::regex_match(command, match, c_pattern);
-    std::string dest = match[1].str();  // First captured group (dest)
-    std::string comp = match[2].str();  // Second captured group (comp)
-    std::string jump = match[3].str();  // Third captured group (jump)
+    std::string dest_str = match[1].str();  // First captured group (dest)
+    std::string comp_str = match[2].str();  // Second captured group (comp)
+    std::string jump_str = match[3].str();  // Third captured group (jump)
 
-    if (dest.empty()) dest = "null";
-    if (comp.empty()) comp = "null";
-    if (jump.empty()) jump = "null";
+    if (dest_str.empty()) dest_str = "null";
+    if (comp_str.empty()) comp_str = "null";
+    if (jump_str.empty()) jump_str = "null";
 
-    std::cout << "command: " << command << std::endl;
-    std::cout << "dest: " << dest << std::endl;
-    std::cout << "comp: " << comp << std::endl;
-    std::cout << "jump: " << jump << "\n" << std::endl;
+    // search for appropriate binary in tables
+    std::string dest_binary = dest[dest_str];
+    std::string comp_binary = comp[comp_str];
+    std::string jump_binary = jump[jump_str];
 
-    return b_header;
+
+    // std::cout << "command: " << command << std::endl;
+    // std::cout << "dest string: " << dest_str << " dest binary: " << dest_binary << std::endl;
+    // std::cout << "comp string: " << comp_str << " comp binary: " << comp_binary << std::endl;
+    // std::cout << "jump string: " << jump_str << " jump binary: " << jump_binary << "\n" << std::endl;
+
+    return "C: "+b_header+comp_binary+dest_binary+jump_binary + " " + command;
 }
 
 std::string translate(std::string command, int& ramAddr){

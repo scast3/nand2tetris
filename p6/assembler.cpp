@@ -107,7 +107,7 @@ std::string translate_A(std::string command, int& ramAddr){
             int mem_val = symbols[value]; // extract mem value from symbol
             std::string binary_value = std::bitset<15>(mem_val).to_string();
             return "1" + binary_value;
-        }else{
+        }else{ // if not in symbols, need to add it in memory
             symbols[value] = ramAddr;
             ramAddr++;
             std::string binary_value = std::bitset<15>(ramAddr).to_string();
@@ -117,9 +117,26 @@ std::string translate_A(std::string command, int& ramAddr){
 
 }
 
-std::string translate_R(std::string command, int& ramAddr){
+std::string translate_C(std::string command, int& ramAddr){
+    std::string b_header = "111";
+    std::regex c_pattern(R"(^([M|D|DM|A|AM|AD|ADM])?=?\s*([A-Za-z0-9+\-*/&|!<>=\s]+)(?:;\s*([JGT|JEQ|JGE|JLT|JNE|JLE|JMP]+))?$)");
+    std::smatch match;
 
-    return "R";
+    std::regex_match(command, match, c_pattern);
+    std::string dest = match[1].str();  // First captured group (dest)
+    std::string comp = match[2].str();  // Second captured group (comp)
+    std::string jump = match[3].str();  // Third captured group (jump)
+
+    if (dest.empty()) dest = "null";
+    if (comp.empty()) comp = "null";
+    if (jump.empty()) jump = "null";
+
+    std::cout << "command: " << command << std::endl;
+    std::cout << "dest: " << dest << std::endl;
+    std::cout << "comp: " << comp << std::endl;
+    std::cout << "jump: " << jump << "\n" << std::endl;
+
+    return b_header;
 }
 
 std::string translate(std::string command, int& ramAddr){
@@ -129,7 +146,7 @@ std::string translate(std::string command, int& ramAddr){
     if (command[0]=='@'){
         return translate_A(command, ramAddr);
     }else{
-        return translate_R(command, ramAddr);
+        return translate_C(command, ramAddr);
     }
 }
 

@@ -1,3 +1,11 @@
+/*
+Author: Santiago Castillo
+Date: 3/1/2025
+Course: CSCI410
+Description: Created an assembler for translating hack assembly to binary
+Note: Regular expressions are a pain in the ass
+*/
+
 #include <iostream>
 #include <string>
 #include <unordered_map>

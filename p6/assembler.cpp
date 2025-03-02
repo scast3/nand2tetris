@@ -96,7 +96,7 @@ std::string translate_A(std::string command, int& ramAddr){
     std::smatch match;
     std::regex_match(command, match, a_command);
     std::string value = match[1];
-    std::string a_header = "R: 0";
+    std::string a_header = "A: 0";
 
     try { // value is int
         int intValue = std::stoi(value);  // Try to convert it to an integer
@@ -118,8 +118,9 @@ std::string translate_A(std::string command, int& ramAddr){
 }
 
 std::string translate_C(std::string command, int& ramAddr){
-    std::string b_header = "111";
-    std::regex c_pattern(R"(^([M|D|DM|A|AM|AD|ADM])?=?\s*([A-Za-z0-9+\-*/&|!<>=\s]+)(?:;\s*([JGT|JEQ|JGE|JLT|JNE|JLE|JMP]+))?$)");
+    std::string b_header = "C: 111";
+    std::regex c_pattern(R"(^([A-Z]+)?=?\s*([A-Za-z0-9+\-*/&|!<>=\s]+)(?:;\s*([JGT|JEQ|JGE|JLT|JNE|JLE|JMP]+))?$)");
+    // std::regex c_pattern(R"(^((?:[ADM]{1,3})?)=?(.*?);?((?:JGT|JEQ|JGE|JLT|JNE|JLE|JMP)?)$)");
     std::smatch match;
 
     std::regex_match(command, match, c_pattern);
@@ -137,12 +138,12 @@ std::string translate_C(std::string command, int& ramAddr){
     std::string jump_binary = jump[jump_str];
 
 
-    // std::cout << "command: " << command << std::endl;
-    // std::cout << "dest string: " << dest_str << " dest binary: " << dest_binary << std::endl;
-    // std::cout << "comp string: " << comp_str << " comp binary: " << comp_binary << std::endl;
-    // std::cout << "jump string: " << jump_str << " jump binary: " << jump_binary << "\n" << std::endl;
+    std::cout << "command: " << command << std::endl;
+    std::cout << "dest string: " << dest_str << " dest binary: " << dest_binary << std::endl;
+    std::cout << "comp string: " << comp_str << " comp binary: " << comp_binary << std::endl;
+    std::cout << "jump string: " << jump_str << " jump binary: " << jump_binary << "\n" << std::endl;
 
-    return "C: "+b_header+comp_binary+dest_binary+jump_binary + " " + command;
+    return b_header+comp_binary+dest_binary+jump_binary;
 }
 
 std::string translate(std::string command, int& ramAddr){

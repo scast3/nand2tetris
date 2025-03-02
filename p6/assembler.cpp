@@ -96,7 +96,7 @@ std::string translate_A(std::string command, int& ramAddr){
     std::smatch match;
     std::regex_match(command, match, a_command);
     std::string value = match[1];
-    std::string a_header = "A: 0";
+    std::string a_header = "0";
 
     try { // value is int
         int intValue = std::stoi(value);  // Try to convert it to an integer
@@ -109,8 +109,8 @@ std::string translate_A(std::string command, int& ramAddr){
             return a_header + binary_value;
         }else{ // if not in symbols, need to add it in memory
             symbols[value] = ramAddr;
-            ramAddr++;
             std::string binary_value = std::bitset<15>(ramAddr).to_string();
+            ramAddr++;
             return a_header + binary_value;
         } 
     }
@@ -118,7 +118,7 @@ std::string translate_A(std::string command, int& ramAddr){
 }
 
 std::string translate_C(std::string command, int& ramAddr){
-    std::string b_header = "C: 111";
+    std::string b_header = "111";
     std::regex c_pattern(R"(^([A-Z]+)?=?\s*([A-Za-z0-9+\-*/&|!<>=\s]+)(?:;\s*([JGT|JEQ|JGE|JLT|JNE|JLE|JMP]+))?$)");
     // std::regex c_pattern(R"(^((?:[ADM]{1,3})?)=?(.*?);?((?:JGT|JEQ|JGE|JLT|JNE|JLE|JMP)?)$)");
     std::smatch match;
@@ -137,11 +137,11 @@ std::string translate_C(std::string command, int& ramAddr){
     std::string comp_binary = comp[comp_str];
     std::string jump_binary = jump[jump_str];
 
-
-    std::cout << "command: " << command << std::endl;
-    std::cout << "dest string: " << dest_str << " dest binary: " << dest_binary << std::endl;
-    std::cout << "comp string: " << comp_str << " comp binary: " << comp_binary << std::endl;
-    std::cout << "jump string: " << jump_str << " jump binary: " << jump_binary << "\n" << std::endl;
+    // Use for debugging C commands
+    // std::cout << "command: " << command << std::endl;
+    // std::cout << "dest string: " << dest_str << " dest binary: " << dest_binary << std::endl;
+    // std::cout << "comp string: " << comp_str << " comp binary: " << comp_binary << std::endl;
+    // std::cout << "jump string: " << jump_str << " jump binary: " << jump_binary << "\n" << std::endl;
 
     return b_header+comp_binary+dest_binary+jump_binary;
 }

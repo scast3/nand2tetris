@@ -11,7 +11,6 @@ std::unordered_map<std::string, std::string> dest;
 std::unordered_map<std::string, std::string> jump;
 
 std::unordered_map<std::string, int> symbols;
-std::unordered_map<std::string, int> labels;
 
 int pc;
 
@@ -35,6 +34,23 @@ void load_map(const std::string& filename, std::unordered_map<std::string, std::
     infile.close();
 }
 
+// load maps from the textfile
+void load_map2(const std::string& filename, std::unordered_map<std::string, int>& my_map) {
+    std::ifstream infile(filename);
+    std::string line;
+
+    while (std::getline(infile, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        int value;
+
+        if (std::getline(iss, key, ',') && iss >> value) {
+            my_map[key] = value;
+        }
+    }
+
+    infile.close();
+}
 std::string next_command(std::ifstream& infile) {
     std::string line;
     std::regex comments("//.*");
@@ -66,7 +82,7 @@ void first_pass(std::ifstream& infile, int& pc){
         if (!(command == "")){
             if(command[0] == '('){ // found label - there might be a better way than just looking at first char
                 std::string label = std::regex_replace(command, labelFormat, "$1");
-                labels[label] = pc; // store the pc for each label
+                symbols[label] = pc; // store the pc for each label
             }else{
                 commands.push_back(command);
                 pc++;
@@ -75,31 +91,54 @@ void first_pass(std::ifstream& infile, int& pc){
     }   
 }
 
-std::string translate_A(std::string command){
-    return "A";
+std::string translate_A(std::string command, int& ramAddr){
+    std::regex a_command("^@(.+)$");
+    std::smatch match;
+    std::regex_match(command, match, a_command);
+    std::string value = match[1];
+
+
+    try { // value is int
+        int intValue = std::stoi(value);  // Try to convert it to an integer
+        std::string binary_value = std::bitset<15>(intValue).to_string(); // convert to binary
+        return "1" + binary_value; // a instructions start with 1
+    } catch (const std::invalid_argument& e) { // value is string
+        if (symbols.find(value) != symbols.end()){ // if the string is in symbols
+            int mem_val = symbols[value]; // extract mem value from symbol
+            std::string binary_value = std::bitset<15>(mem_val).to_string();
+            return "1" + binary_value;
+        }else{
+            symbols[value] = ramAddr;
+            ramAddr++;
+            std::string binary_value = std::bitset<15>(ramAddr).to_string();
+            return "1" + binary_value;
+        } 
+    }
+
 }
 
-std::string translate_R(std::string command){
+std::string translate_R(std::string command, int& ramAddr){
 
     return "R";
 }
 
-std::string translate(std::string command){
+std::string translate(std::string command, int& ramAddr){
     std::regex whitespaces("\\s+");
     command = std::regex_replace(command, whitespaces, "");
 
     if (command[0]=='@'){
-        return translate_A(command);
+        return translate_A(command, ramAddr);
     }else{
-        return translate_R(command);
+        return translate_R(command, ramAddr);
     }
 }
 
 void second_pass(std::ofstream& outfile){
     std::string binary_command;
-    // somewhere, variable mem location needs to be change
+    // variable mem location needs to start at 16
+    int ramAddr = 16;
     for (const std::string& command : commands){ //iterate through commands
-        binary_command = translate(command);
+        binary_command = translate(command, ramAddr);
         outfile << binary_command << std::endl; // write binary to output file
     }
 }
@@ -114,6 +153,7 @@ int main (int argc, char** argv){
     load_map("comp.txt", comp);
     load_map("dest.txt", dest);
     load_map("jump.txt", jump);
+    load_map2("symbols.txt", symbols);
 
     std::string input_file = argv[1];
     std::ifstream infile(input_file);
@@ -136,5 +176,6 @@ int main (int argc, char** argv){
     second_pass(outfile);
 
     infile.close();
+    outfile.close();
     return 0;
 }

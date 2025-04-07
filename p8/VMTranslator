@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <file.vm | directory> [-o <output.asm>]"
+    exit 1
+fi
+
+python3 translator.py "$@"

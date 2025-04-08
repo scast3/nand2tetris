@@ -1,0 +1,68 @@
+class Main {
+    field Board gameBoard;
+    field Player player1;
+    field Player player2;
+    field String currentPlayer;
+    field int move;
+
+    constructor Main function void {
+        let gameBoard = Board.new();
+        let player1 = Player.new();
+        let player2 = Player.new();
+        do player1.setSymbol("X");
+        do player2.setSymbol("O");
+        let currentPlayer = "X";
+        do playGame();
+        return;
+    }
+
+    method void playGame() {
+        var boolean gameWon;
+        var boolean gameFull;
+        var String playerSymbol;
+        let gameWon = false;
+        let gameFull = false;
+
+        while (gameWon == false && gameFull == false) {
+            // Print the board
+            do gameBoard.printBoard();
+            if (currentPlayer == "X") {
+                let playerSymbol = "X";
+            } else {
+                let playerSymbol = "O";
+            }
+            // Get input from the player
+            do Output.printString("Player ");
+            do Output.printString(currentPlayer);
+            do Output.printString(", enter your move (0-8): ");
+            let move = Input.readInt();
+
+            // Make the move
+            do gameBoard.makeMove(move, playerSymbol);
+
+            // Check for a winner
+            let gameWon = gameBoard.checkWinner(playerSymbol);
+            if (gameWon == true) {
+                do Output.printString("Player ");
+                do Output.printString(currentPlayer);
+                do Output.printString(" wins!\n");
+                return;
+            }
+
+            // Check if the board is full (draw)
+            let gameFull = gameBoard.isFull();
+            if (gameFull == true) {
+                do Output.printString("It's a draw!\n");
+                return;
+            }
+
+            // Switch to the other player
+            if (currentPlayer == "X") {
+                let currentPlayer = "O";
+            } else {
+                let currentPlayer = "X";
+            }
+        }
+        return;
+    }
+}

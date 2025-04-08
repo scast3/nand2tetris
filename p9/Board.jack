@@ -1,0 +1,85 @@
+class Board {
+    field array field[9];  // A 1D array to represent the 3x3 grid
+
+    // Constructor
+    constructor Board function void {
+        var int i;
+        let i = 0;
+        while (i < 9) {
+            let field[i] = "";  // Initialize each cell to be empty
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // Method to print the board
+    method void printBoard function void {
+        var int i;
+        var String row;
+        let i = 0;
+        while (i < 9) {
+            let row = field[i];
+            if (row == "") {
+                let row = " ";  // Empty cells display as spaces
+            }
+            do Output.printString(row);
+            if ((i + 1) % 3 == 0) {
+                do Output.printString("\n");  // New line after every 3 cells
+            } else {
+                do Output.printString("|");  // Separator between cells
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // Method to make a move (set cell value to "X" or "O")
+    method void makeMove(int position, String symbol) {
+        let field[position] = symbol;
+        return;
+    }
+
+    // Method to check if a player has won
+    method boolean checkWinner(String symbol) {
+        var int i;
+        var boolean win;
+
+        // Check rows, columns, and diagonals
+        let win = false;
+        let i = 0;
+        while (i < 3) {
+            // Check rows
+            if (field[i * 3] == symbol && field[i * 3 + 1] == symbol && field[i * 3 + 2] == symbol) {
+                let win = true;
+            }
+            // Check columns
+            if (field[i] == symbol && field[i + 3] == symbol && field[i + 6] == symbol) {
+                let win = true;
+            }
+            let i = i + 1;
+        }
+
+        // Check diagonals
+        if (field[0] == symbol && field[4] == symbol && field[8] == symbol) {
+            let win = true;
+        }
+        if (field[2] == symbol && field[4] == symbol && field[6] == symbol) {
+            let win = true;
+        }
+
+        return win;
+    }
+
+    // Method to check if the board is full
+    method boolean isFull() {
+        var int i;
+        let i = 0;
+        while (i < 9) {
+            if (field[i] == "") {
+                return false;
+            }
+            let i = i + 1;
+        }
+        return true;
+    }
+}
